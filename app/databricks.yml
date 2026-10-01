@@ -24,11 +24,11 @@ resources:
       lifecycle:
         started: true
 
-      # Sem user_api_scopes: consultas e Genie rodam com o service principal do App (decisão do projeto).
-      # Para executar em nome do analista (OBO), descomente:
-      # user_api_scopes:
-      #   - sql
-      #   - dashboards.genie
+      # Fila, KPIs e grafo (plugin analytics) rodam com o service principal do App.
+      # O plugin genie() do AppKit executa sempre em nome do usuário (OBO) e exige este escopo:
+      # cada analista precisa de CAN_RUN no Genie Agent e SELECT nas tabelas abaixo.
+      user_api_scopes:
+        - dashboards.genie
 
       # Recursos do App — as permissões abaixo são concedidas ao service principal automaticamente no deploy
       resources:

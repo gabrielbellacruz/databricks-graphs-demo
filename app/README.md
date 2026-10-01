@@ -1,183 +1,39 @@
-# cielo-pld-grafos
+# App `cielo-pld-grafos` — Investigação PLD em grafos
 
-A Databricks App powered by [AppKit](https://developers.databricks.com/docs/appkit/v0/), featuring React, TypeScript, and Tailwind CSS.
+Databricks App (AppKit · React + Node) para o analista interno de PLD/prevenção a fraude da Cielo, empacotado como **DAB** (`databricks.yml`).
 
-**Enabled plugins:**
-- **Analytics** -- SQL query execution against Databricks SQL Warehouses
-- **Server** -- Express HTTP server with static file serving and Vite dev mode
+| Tela | Rota | O que mostra |
+|---|---|---|
+| Fila de risco | `/` | KPIs (novos suspeitos, risco ALTO, fraude confirmada, grupos suspeitos), fila priorizada com filtros e principais sinais traduzidos, risco ALTO por ramo |
+| Rede de vínculos | `/rede?ec=<EC>` | Ficha da loja + grafo interativo (dono, sócio, contas, telefones, e-mails, endereço, dispositivos, lojas conectadas e PIX ≥ R$ 5 mil) + lista de lojas conectadas |
+| Genie Agent | `/genie` | Chat com o Genie Agent "Cielo PLD · Investigação em grafos": SQL gerado visível, status, aviso de IA e perguntas sugeridas; o botão "Explicar com o Genie" das outras telas abre o chat já com a pergunta da loja |
 
-## Prerequisites
+## Dados e identidade
 
-- Node.js v22+ and npm
-- Databricks CLI (for deployment)
-- Access to a Databricks workspace
+- Consultas em `config/queries/*.sql` (plugin `analytics`) sobre `cielo_pld.gold` / `cielo_pld.silver`, executadas pelo **service principal** do App.
+- O **Genie** roda **em nome do usuário** (OBO, escopo `dashboards.genie`) — o plugin `genie()` do AppKit é sempre OBO. Cada analista precisa de
+  `CAN_RUN` no Genie Agent e `SELECT` nas tabelas usadas por ele.
+- Recursos declarados no `databricks.yml` (permissões concedidas ao service principal no deploy): SQL warehouse (`CAN_USE`), Genie Agent (`CAN_RUN`) e as
+  11 tabelas (`SELECT`).
 
-## Databricks Authentication
+## Genie Agent
 
-### Local Development
-
-For local development, configure your environment variables by creating a `.env` file:
-
-```bash
-cp .env.example .env
-```
-
-Edit `.env` and set the environment variables you need:
-
-```env
-DATABRICKS_HOST=https://your-workspace.cloud.databricks.com
-DATABRICKS_APP_PORT=8000
-# ... other environment variables, depending on the plugins you use
-```
-
-### CLI Authentication
-
-The Databricks CLI requires authentication to deploy and manage apps. Configure authentication using one of these methods:
-
-#### OAuth U2M
-
-Interactive browser-based authentication with short-lived tokens:
+Configuração versionada em `genie/build_space.py` → `genie/genie_space.json` (descrições e sinônimos por coluna, joins, filtros, medidas, exemplos SQL
+validados e instruções). Para atualizar o Agent depois de editar o script:
 
 ```bash
-databricks auth login --host https://your-workspace.cloud.databricks.com
+python3 genie/build_space.py
+databricks genie update-space 01f1bdacc8141798b11a226a3eb97cac \
+  --json "{\"serialized_space\": $(jq -c . genie/genie_space.json | jq -Rs .)}" --profile gabriel-bella-cruz-classic-sandbox
 ```
 
-This will open your browser to complete authentication. The CLI saves credentials to `~/.databrickscfg`.
-
-#### Configuration Profiles
-
-Use multiple profiles for different workspaces:
-
-```ini
-[DEFAULT]
-host = https://dev-workspace.cloud.databricks.com
-
-[production]
-host = https://prod-workspace.cloud.databricks.com
-client_id = prod-client-id
-client_secret = prod-client-secret
-```
-
-Deploy using a specific profile:
+## Desenvolvimento e deploy
 
 ```bash
-databricks bundle deploy --profile production
+npm install                     # usa registry.npmjs.org (.npmrc) — o proxy npm interno não é acessível pelo container do App
+npm run dev                     # local, com .env (DATABRICKS_CONFIG_PROFILE, DATABRICKS_WAREHOUSE_ID, DATABRICKS_GENIE_SPACE_ID)
+databricks apps validate --profile gabriel-bella-cruz-classic-sandbox
+databricks apps deploy -t default --profile gabriel-bella-cruz-classic-sandbox
 ```
 
-**Note:** Personal Access Tokens (PATs) are legacy authentication. OAuth is strongly recommended for better security.
-
-## Getting Started
-
-### Install Dependencies
-
-```bash
-npm install
-```
-
-### Development
-
-Run the app in development mode with hot reload:
-
-```bash
-npm run dev
-```
-
-The app will be available at the URL shown in the console output.
-
-### Build
-
-Build both client and server for production:
-
-```bash
-npm run build
-```
-
-This creates:
-
-- `dist/server.js` - Compiled server bundle
-- `client/dist/` - Bundled client assets
-
-### Production
-
-Run the production build:
-
-```bash
-npm start
-```
-
-## Code Quality
-
-There are a few commands to help you with code quality:
-
-```bash
-# Type checking
-npm run typecheck
-
-# Linting
-npm run lint
-npm run lint:fix
-
-# Formatting
-npm run format
-npm run format:fix
-```
-
-## Deployment with Databricks Asset Bundles
-
-### 1. Configure Bundle
-
-Update `databricks.yml` with your workspace settings:
-
-```yaml
-targets:
-  default:
-    workspace:
-      host: https://your-workspace.cloud.databricks.com
-```
-
-Make sure to replace all placeholder values in `databricks.yml` with your actual resource IDs.
-
-### 2. Deploy
-
-Deploy and start the app with a single command:
-
-```bash
-databricks apps deploy
-```
-
-`databricks apps deploy` validates the project, deploys it, starts the app, and prints its URL.
-
-### Deploy to Production
-
-1. Configure the production target in `databricks.yml`
-2. Deploy to production:
-
-```bash
-databricks apps deploy -t prod
-```
-
-> **Restarting a stopped app:** apps stop after a period of inactivity. To start one again without redeploying, run `databricks apps start <APP_NAME>`.
-
-## Project Structure
-
-```
-* client/          # React frontend
-  * src/           # Source code
-  * public/        # Static assets
-* server/          # Express backend
-  * server.ts      # Server entry point
-  * routes/        # Routes
-* shared/          # Shared types
-* config/          # Configuration
-  * queries/       # SQL query files
-* databricks.yml   # Bundle configuration
-* app.yaml         # App configuration
-* .env.example     # Environment variables example
-```
-
-## Tech Stack
-
-- **Backend**: Node.js, Express
-- **Frontend**: React.js, TypeScript, Vite, Tailwind CSS, React Router
-- **UI Components**: Radix UI, shadcn/ui
-- **Databricks**: AppKit SDK
+> Se um deploy falhar na instalação de pacotes e o seguinte acusar `ENOTEMPTY` em `node_modules`, rode `databricks apps stop cielo-pld-grafos` e faça o deploy de novo (container limpo).

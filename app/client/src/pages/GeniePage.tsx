@@ -73,8 +73,9 @@ export function GeniePage() {
           Você está conectado como <Badge variant="secondary">{eu?.email ?? 'usuário autenticado'}</Badge>
         </AlertTitle>
         <AlertDescription>
-          As consultas do Genie rodam com o <strong>service principal do App</strong> (permissões do App no Unity Catalog, não as suas) sobre as tabelas
-          do catálogo <code>cielo_pld</code>. Ambiente de demonstração com dados sintéticos.
+          As perguntas ao Genie rodam <strong>em seu nome</strong> (on-behalf-of): você só vê o que as suas permissões no Unity Catalog permitem
+          nas tabelas do catálogo <code>cielo_pld</code>, e as consultas ficam auditadas no seu usuário. As telas de fila e rede usam o service principal do App.
+          Ambiente de demonstração com dados sintéticos.
         </AlertDescription>
       </Alert>
 

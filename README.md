@@ -31,6 +31,11 @@ Todos rodam com *Run all*.
 | Notebooks no workspace | `/Users/gabriel.bellamartini@databricks.com/pld-grafos/` |
 | Modelo UC / Endpoint | `cielo_pld.gold.modelo_risco_pld_ec@champion` / `cielo-pld-risco-ec` |
 
+## App de investigação (`app/`)
+
+Databricks App **`cielo-pld-grafos`** (AppKit, DAB em `app/databricks.yml`) para o analista de PLD: fila de risco, rede de vínculos em grafo e Genie Agent
+"Cielo PLD · Investigação em grafos" (`01f1bdacc8141798b11a226a3eb97cac`). URL: https://cielo-pld-grafos-7474647724744831.aws.databricksapps.com — ver `app/README.md`.
+
 ## Setup do instrutor (uma vez, antes do workshop)
 
 1. Cluster DBR 16.4 LTS ML (Dedicated) com as duas bibliotecas acima instaladas.
