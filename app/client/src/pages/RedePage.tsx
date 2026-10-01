@@ -26,8 +26,8 @@ import {
 import { sql } from '@databricks/appkit-ui/js';
 import { MessageSquareText } from 'lucide-react';
 import { ErroConsulta, FaixaBadge, Sinais, StatusLoja } from '@/components/Indicadores';
-import { GrafoRede, LegendaGrafo } from '@/components/GrafoRede';
-import { RELACOES } from '@/lib/grafo';
+import { GrafoRede } from '@/components/GrafoRede';
+import { montarVisao } from '@/lib/grafo';
 import type { LinhaRede } from '@/lib/grafo';
 import { fmtInteiro, fmtMoeda, fmtPct, fmtScore, num } from '@/lib/format';
 import { perguntaExplicar } from '@/lib/genie';
@@ -129,59 +129,49 @@ function Rede({ ec, onEc }: { ec: string; onEc: (v: string) => void }) {
   const { data, loading, error } = useAnalyticsQuery('rede_loja', params);
   const linhas = useMemo(() => (data ?? []) as LinhaRede[], [data]);
   const raiz = `LOJA:${ec}`;
-  const conectadas = useMemo(() => {
-    const m = new Map<string, { id: string; nome: string; fraude: number; score: number | null; faixa: string | null; vias: Set<string> }>();
-    for (const l of linhas) {
-      for (const [id, tipo, nome, fraude, score, faixa] of [
-        [l.src, l.src_tipo, l.src_nome, l.src_fraude, l.src_score, l.src_faixa],
-        [l.dst, l.dst_tipo, l.dst_nome, l.dst_fraude, l.dst_score, l.dst_faixa],
-      ] as const) {
-        if (tipo !== 'LOJA' || id === raiz) continue;
-        if (!m.has(id)) m.set(id, { id, nome, fraude: Number(fraude), score: score === null ? null : Number(score), faixa, vias: new Set() });
-        m.get(id)?.vias.add(RELACOES[l.relacao] ?? l.relacao);
-      }
-    }
-    return [...m.values()].sort((a, b) => (b.fraude - a.fraude) || ((b.score ?? 0) - (a.score ?? 0)));
-  }, [linhas, raiz]);
+  // Mesma visão do grafo: lojas já ordenadas por fraude confirmada e score, com o que cada uma compartilha com a rede
+  const conectadas = useMemo(() => montarVisao(linhas, raiz, false).nos.filter((n) => n.tipo === 'LOJA' && !n.raiz), [linhas, raiz]);
 
   return (
-    <div className="grid gap-6 xl:grid-cols-3">
-      <Card className="xl:col-span-2">
+    <div className="space-y-6">
+      <Card>
         <CardHeader>
           <CardTitle>
             {loading ? 'Rede de vínculos' : conectadas.length > 0
-              ? `Ligada a ${conectadas.length} outras lojas — ${conectadas.filter((c) => c.fraude === 1).length} com fraude confirmada`
+              ? `Ligada a ${conectadas.length} outras lojas — ${conectadas.filter((c) => c.fraude).length} com fraude confirmada`
               : 'Nenhuma outra loja ligada por atributos compartilhados'}
           </CardTitle>
-          <CardDescription>Dono, sócio, contas, telefones, e-mails, endereço e dispositivos da loja, quem mais os compartilha e o fluxo PIX entre eles. Clique numa loja para recentralizar. Fonte: gold.grafo_*_resolvido</CardDescription>
+          <CardDescription>
+            O que a loja divide com outras lojas e pessoas (conta, sócio, dispositivo, telefone, e-mail, endereço) e o PIX entre elas.
+            Donos e sócios aparecem dentro da loja. Fonte: gold.grafo_*_resolvido
+          </CardDescription>
         </CardHeader>
         <CardContent className="space-y-3">
           {error && <ErroConsulta erro={error} />}
-          {loading && <Skeleton className="h-[560px] w-full" />}
+          {loading && <Skeleton className="h-[600px] w-full" />}
           {!loading && !error && linhas.length === 0 && (
             <Empty><EmptyHeader><EmptyTitle>Sem vínculos para este EC</EmptyTitle><EmptyDescription>A loja não tem atributos no grafo resolvido.</EmptyDescription></EmptyHeader></Empty>
           )}
           {!loading && !error && linhas.length > 0 && <GrafoRede linhas={linhas} raiz={raiz} onSelecionarLoja={onEc} />}
-          <LegendaGrafo />
         </CardContent>
       </Card>
       <Card>
         <CardHeader>
           <CardTitle>Lojas conectadas</CardTitle>
-          <CardDescription>Ordenadas por fraude confirmada e score</CardDescription>
+          <CardDescription>Ordenadas por fraude confirmada e score · clique para abrir a rede da loja</CardDescription>
         </CardHeader>
-        <CardContent className="space-y-2">
+        <CardContent className="grid gap-2 md:grid-cols-2 xl:grid-cols-3">
           {loading && Array.from({ length: 5 }, (_, i) => <Skeleton key={i} className="h-12 w-full" />)}
           {!loading && conectadas.length === 0 && <p className="text-sm text-muted-foreground">Nenhuma loja conectada a 3 saltos.</p>}
           {conectadas.map((c) => (
             <button key={c.id} type="button" onClick={() => onEc(c.id.replace('LOJA:', ''))}
               className="w-full rounded-md border p-2 text-left hover:bg-muted">
               <div className="flex items-center justify-between gap-2">
-                <span className="truncate font-medium">{c.nome}</span>
-                {c.fraude === 1 ? <Badge variant="destructive">Fraude</Badge> : <FaixaBadge faixa={c.faixa} />}
+                <span className="truncate font-medium">{c.titulo}</span>
+                {c.fraude ? <Badge variant="destructive">Fraude</Badge> : <FaixaBadge faixa={c.faixa} />}
               </div>
               <div className="text-xs text-muted-foreground">
-                {c.id.replace('LOJA:', 'EC ')} · score {c.score === null ? '—' : fmtScore(c.score)} · {[...c.vias].join(', ')}
+                {c.subtitulo}{c.compartilha.length > 0 ? ` · compartilha ${c.compartilha.join(', ')}` : ''}
               </div>
             </button>
           ))}

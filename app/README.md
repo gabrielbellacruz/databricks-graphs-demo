@@ -5,13 +5,13 @@ Databricks App (AppKit · React + Node) para o analista interno de PLD/prevenç�
 | Tela | Rota | O que mostra |
 |---|---|---|
 | Fila de risco | `/` | KPIs (novos suspeitos, risco ALTO, fraude confirmada, grupos suspeitos), fila priorizada com filtros e principais sinais traduzidos, risco ALTO por ramo |
-| Rede de vínculos | `/rede?ec=<EC>` | Ficha da loja + grafo interativo (dono, sócio, contas, telefones, e-mails, endereço, dispositivos, lojas conectadas e PIX ≥ R$ 5 mil) + lista de lojas conectadas |
+| Rede de vínculos | `/rede?ec=<EC>` | Ficha da loja + grafo interativo em **React Flow** (`@xyflow/react`): lojas à esquerda, o que elas compartilham à direita (conta, sócio, dispositivo, telefone, e-mail, endereço) e PIX ≥ R$ 5 mil em arcos. Vermelho = liga a loja com fraude confirmada, âmbar = compartilhado; hover destaca a vizinhança, clique abre o inspetor, lista de sinais clicável e chave para mostrar os vínculos exclusivos |
 | Genie Agent | `/genie` | Chat com o Genie Agent "Cielo PLD · Investigação em grafos": SQL gerado visível, status, aviso de IA e perguntas sugeridas; o botão "Explicar com o Genie" das outras telas abre o chat já com a pergunta da loja |
 
 ## Dados e identidade
 
 - Consultas em `config/queries/*.sql` (plugin `analytics`) sobre `cielo_pld.gold` / `cielo_pld.silver`, executadas pelo **service principal** do App.
-- O **Genie** roda **em nome do usuário** (OBO, escopo `dashboards.genie`) — o plugin `genie()` do AppKit é sempre OBO. Cada analista precisa de
+- O **Genie** roda **em nome do usuário** (OBO, escopo `genie` — o antigo `dashboards.genie` está descontinuado) — o plugin `genie()` do AppKit é sempre OBO. Cada analista precisa de
   `CAN_RUN` no Genie Agent e `SELECT` nas tabelas usadas por ele.
 - Recursos declarados no `databricks.yml` (permissões concedidas ao service principal no deploy): SQL warehouse (`CAN_USE`), Genie Agent (`CAN_RUN`) e as
   11 tabelas (`SELECT`).

@@ -25,10 +25,11 @@ resources:
         started: true
 
       # Fila, KPIs e grafo (plugin analytics) rodam com o service principal do App.
-      # O plugin genie() do AppKit executa sempre em nome do usuário (OBO) e exige este escopo:
-      # cada analista precisa de CAN_RUN no Genie Agent e SELECT nas tabelas abaixo.
+      # O plugin genie() do AppKit executa sempre em nome do usuário (OBO) e exige o escopo "genie"
+      # ("dashboards.genie" está descontinuado e não é aceito pela Conversation API).
+      # Cada analista precisa de CAN_RUN no Genie Agent e SELECT nas tabelas abaixo.
       user_api_scopes:
-        - dashboards.genie
+        - genie
 
       # Recursos do App — as permissões abaixo são concedidas ao service principal automaticamente no deploy
       resources:
