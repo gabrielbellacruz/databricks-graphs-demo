@@ -1,0 +1,1204 @@
+{
+ "version": 2,
+ "config": {
+  "sample_questions": [
+   {
+    "id": "125a97f80e3cf55596e4071498e1b93a",
+    "question": [
+     "Quais pessoas recebem mais PIX de lojas em risco ALTO?"
+    ]
+   },
+   {
+    "id": "29f76f5fa4d17ed21f59c529531668ab",
+    "question": [
+     "Quais lojas compartilham conta de liquidação com lojas que têm fraude confirmada?"
+    ]
+   },
+   {
+    "id": "9d71a17e0e6534c25f7f6c4a1c9a39a2",
+    "question": [
+     "Quais ramos de atividade concentram mais lojas em risco ALTO?"
+    ]
+   },
+   {
+    "id": "a96f3234ee8204e76281dcd289e58cdd",
+    "question": [
+     "Quantas lojas em risco ALTO têm sócio em comum com uma loja fraudada?"
+    ]
+   },
+   {
+    "id": "ebda96b6a700f8d2e1ecb2382d7f147a",
+    "question": [
+     "Quais são as 10 lojas com maior score de risco que ainda não estão na lista negativa?"
+    ]
+   }
+  ]
+ },
+ "data_sources": {
+  "tables": [
+   {
+    "identifier": "cielo_pld.gold.features_grafo_loja",
+    "column_configs": [
+     {
+      "column_name": "chargeback_medio_comunidade",
+      "description": [
+       "Chargeback médio (%) das outras lojas da comunidade."
+      ]
+     },
+     {
+      "column_name": "dist_fraude",
+      "description": [
+       "Distância (em saltos no grafo de vínculos) até a loja com fraude confirmada mais próxima; 99 = sem caminho."
+      ],
+      "synonyms": [
+       "distância até fraude"
+      ]
+     },
+     {
+      "column_name": "fl_conta_compartilhada",
+      "description": [
+       "1 = liquida ou recebe PIX numa conta usada por loja de outra raiz de CNPJ."
+      ],
+      "synonyms": [
+       "conta compartilhada"
+      ]
+     },
+     {
+      "column_name": "fl_socio_comum_fraude",
+      "description": [
+       "1 = tem sócio/responsável em comum com loja fraudada."
+      ],
+      "synonyms": [
+       "sócio em comum"
+      ]
+     },
+     {
+      "column_name": "grau",
+      "description": [
+       "Número de conexões da loja no grafo."
+      ]
+     },
+     {
+      "column_name": "id_componente",
+      "description": [
+       "Grupo de vínculos (mesmo que na fila)."
+      ],
+      "synonyms": [
+       "grupo",
+       "anel"
+      ]
+     },
+     {
+      "column_name": "nu_ec",
+      "description": [
+       "Número do Estabelecimento Comercial (EC) — identificador da loja."
+      ],
+      "synonyms": [
+       "EC",
+       "estabelecimento",
+       "número do EC",
+       "loja"
+      ]
+     },
+     {
+      "column_name": "pagerank",
+      "description": [
+       "PageRank do titular no fluxo de PIX — centralidade no fluxo de dinheiro."
+      ],
+      "synonyms": [
+       "centralidade"
+      ]
+     },
+     {
+      "column_name": "pct_vizinhos_chargeback_alto",
+      "description": [
+       "Fração das lojas vizinhas com chargeback acima de 1%."
+      ]
+     },
+     {
+      "column_name": "pct_vizinhos_fraude",
+      "description": [
+       "Fração das lojas vizinhas com fraude confirmada."
+      ]
+     },
+     {
+      "column_name": "qt_ciclos_pix",
+      "description": [
+       "Ciclos de PIX de alto valor (A→B→C→A) envolvendo o titular."
+      ],
+      "synonyms": [
+       "ciclos",
+       "layering"
+      ]
+     },
+     {
+      "column_name": "qt_contas_liquidacao",
+      "description": [
+       "Quantidade de contas de liquidação (domicílio) usadas pela loja."
+      ]
+     },
+     {
+      "column_name": "qt_destinos_pix",
+      "description": [
+       "Pessoas/empresas distintas que receberam PIX do titular."
+      ]
+     },
+     {
+      "column_name": "qt_lojas_componente",
+      "description": [
+       "Quantidade de lojas no mesmo grupo de vínculos."
+      ],
+      "synonyms": [
+       "lojas no grupo"
+      ]
+     },
+     {
+      "column_name": "qt_lojas_comunidade",
+      "description": [
+       "Lojas na mesma comunidade (labelPropagation sobre vínculos + PIX)."
+      ]
+     },
+     {
+      "column_name": "qt_lojas_vizinhas",
+      "description": [
+       "Lojas que compartilham pelo menos um atributo com esta loja."
+      ]
+     },
+     {
+      "column_name": "qt_outras_lojas_fraude_componente",
+      "description": [
+       "Outras lojas com fraude confirmada no mesmo grupo (exclui a própria loja)."
+      ]
+     },
+     {
+      "column_name": "qt_outras_lojas_fraude_comunidade",
+      "description": [
+       "Outras lojas com fraude confirmada na comunidade."
+      ]
+     },
+     {
+      "column_name": "qt_pagadores_pix",
+      "description": [
+       "Pessoas/empresas distintas que enviaram PIX ao titular."
+      ]
+     },
+     {
+      "column_name": "qt_raizes_componente",
+      "description": [
+       "Quantidade de raízes de CNPJ diferentes no grupo (lojas sem vínculo societário ligadas entre si)."
+      ]
+     },
+     {
+      "column_name": "qt_socios",
+      "description": [
+       "Quantidade de sócios/responsáveis pela maquininha."
+      ]
+     },
+     {
+      "column_name": "qt_triangulos",
+      "description": [
+       "Triângulos no grafo loja-loja (lojas interligadas)."
+      ]
+     },
+     {
+      "column_name": "tam_componente",
+      "description": [
+       "Total de vértices (lojas, pessoas, contas, telefones...) no grupo de vínculos."
+      ]
+     }
+    ]
+   },
+   {
+    "identifier": "cielo_pld.gold.fila_investigacao_pld",
+    "column_configs": [
+     {
+      "column_name": "faixa_risco",
+      "description": [
+       "Faixa do score: ALTO (top 5%), MEDIO (top 15%), BAIXO."
+      ],
+      "synonyms": [
+       "faixa",
+       "nível de risco"
+      ],
+      "enable_entity_matching": true,
+      "enable_format_assistance": true
+     },
+     {
+      "column_name": "fl_fraude_confirmada",
+      "description": [
+       "1 = loja com inserção ativa na lista negativa de EC (fraude/PLD confirmada pela área)."
+      ],
+      "synonyms": [
+       "fraude confirmada",
+       "lista negativa",
+       "fraudada"
+      ]
+     },
+     {
+      "column_name": "fl_novo_suspeito",
+      "description": [
+       "1 = loja em risco ALTO que ainda NÃO está na lista negativa (novo suspeito a investigar)."
+      ],
+      "synonyms": [
+       "novo suspeito",
+       "não listada"
+      ]
+     },
+     {
+      "column_name": "id_componente",
+      "description": [
+       "Grupo de vínculos (componente conexo do grafo). Lojas com o mesmo id_componente estão ligadas por conta, sócio, telefone, e-mail, endereço ou dispositivo."
+      ],
+      "synonyms": [
+       "grupo",
+       "anel",
+       "rede",
+       "componente"
+      ]
+     },
+     {
+      "column_name": "nm_loja",
+      "description": [
+       "Nome fantasia da loja."
+      ],
+      "synonyms": [
+       "nome da loja",
+       "estabelecimento"
+      ],
+      "enable_entity_matching": true
+     },
+     {
+      "column_name": "nm_ramo",
+      "description": [
+       "Ramo de atividade da loja."
+      ],
+      "synonyms": [
+       "ramo",
+       "segmento",
+       "MCC"
+      ],
+      "enable_entity_matching": true,
+      "enable_format_assistance": true
+     },
+     {
+      "column_name": "nu_ec",
+      "description": [
+       "Número do Estabelecimento Comercial (EC) — identificador da loja."
+      ],
+      "synonyms": [
+       "EC",
+       "estabelecimento",
+       "número do EC",
+       "loja"
+      ]
+     },
+     {
+      "column_name": "posicao_fila",
+      "description": [
+       "Posição na fila de investigação (1 = maior risco)."
+      ],
+      "synonyms": [
+       "ranking",
+       "posição"
+      ]
+     },
+     {
+      "column_name": "principais_sinais",
+      "description": [
+       "Três features do modelo que mais elevaram o score da loja (nomes técnicos separados por vírgula, ex.: fl_conta_compartilhada = conta compartilhada com outra loja)."
+      ],
+      "synonyms": [
+       "motivos",
+       "sinais",
+       "explicação"
+      ]
+     },
+     {
+      "column_name": "score_pld",
+      "description": [
+       "Score de risco PLD do modelo XGBoost (0 a 1, out-of-fold). Quanto maior, maior a prioridade de investigação."
+      ],
+      "synonyms": [
+       "score",
+       "risco",
+       "probabilidade"
+      ]
+     },
+     {
+      "column_name": "ts_score",
+      "description": [
+       "Data/hora do cálculo do score."
+      ]
+     }
+    ]
+   },
+   {
+    "identifier": "cielo_pld.gold.grafo_arestas_resolvido",
+    "column_configs": [
+     {
+      "column_name": "dst",
+      "description": [
+       "Vértice de destino (grafo_vertices_resolvido.id)."
+      ]
+     },
+     {
+      "column_name": "qt",
+      "description": [
+       "Quantidade de eventos na relação."
+      ]
+     },
+     {
+      "column_name": "relacao",
+      "description": [
+       "titular (loja→dono), socio (loja→sócio), liquida_em (loja→conta), localizada_em (loja→endereço), recebe_em / paga_com (pessoa→conta PIX), tem_telefone, tem_email, usa_dispositivo, entrega_em, portador (pessoa→cartão), compra (cartão→loja), pix (pessoa→pessoa, fluxo de dinheiro)."
+      ],
+      "synonyms": [
+       "vínculo",
+       "relação"
+      ],
+      "enable_entity_matching": true
+     },
+     {
+      "column_name": "src",
+      "description": [
+       "Vértice de origem (grafo_vertices_resolvido.id)."
+      ]
+     },
+     {
+      "column_name": "valor",
+      "description": [
+       "Valor total (R$) — PIX, compras e antecipações."
+      ]
+     }
+    ]
+   },
+   {
+    "identifier": "cielo_pld.gold.grafo_vertices_resolvido",
+    "column_configs": [
+     {
+      "column_name": "fl_fraude",
+      "description": [
+       "1 = loja com fraude confirmada."
+      ]
+     },
+     {
+      "column_name": "id",
+      "description": [
+       "Id do vértice: LOJA:<EC>, IDN:<identidade>, CONTA:<ispb|ag|conta>, TEL:, EMAIL:, END:, DISP:, CARTAO:."
+      ]
+     },
+     {
+      "column_name": "nome",
+      "description": [
+       "Nome da loja/pessoa ou valor do atributo."
+      ]
+     },
+     {
+      "column_name": "nu_ec",
+      "description": [
+       "EC (só para vértices LOJA)."
+      ]
+     },
+     {
+      "column_name": "tipo",
+      "description": [
+       "LOJA, IDENTIDADE (pessoa/empresa resolvida), CONTA, TELEFONE, EMAIL, ENDERECO, DISPOSITIVO ou CARTAO."
+      ],
+      "enable_entity_matching": true
+     }
+    ]
+   },
+   {
+    "identifier": "cielo_pld.silver.fraude_reportada",
+    "column_configs": [
+     {
+      "column_name": "cd_tipo_rsps_frde",
+      "description": [
+       "Código do tipo de fraude reportada."
+      ]
+     },
+     {
+      "column_name": "id_unco_lynx",
+      "exclude": true
+     },
+     {
+      "column_name": "nu_ec",
+      "description": [
+       "Número do Estabelecimento Comercial (EC) — identificador da loja."
+      ],
+      "synonyms": [
+       "EC",
+       "estabelecimento",
+       "número do EC",
+       "loja"
+      ]
+     },
+     {
+      "column_name": "nu_token_cartao",
+      "exclude": true
+     },
+     {
+      "column_name": "ts_reporte",
+      "description": [
+       "Data/hora do reporte de fraude."
+      ]
+     },
+     {
+      "column_name": "ts_transacao",
+      "description": [
+       "Data/hora da transação fraudada."
+      ]
+     }
+    ]
+   },
+   {
+    "identifier": "cielo_pld.silver.identidade",
+    "column_configs": [
+     {
+      "column_name": "cpf_cnpj",
+      "description": [
+       "Documento padronizado (pode ser uma grafia com dígito trocado)."
+      ]
+     },
+     {
+      "column_name": "id_identidade",
+      "description": [
+       "Identidade resolvida (Splink + connectedComponents): documentos com o mesmo id são a mesma pessoa/empresa."
+      ]
+     },
+     {
+      "column_name": "nm_identidade",
+      "description": [
+       "Nome mais frequente da identidade."
+      ]
+     },
+     {
+      "column_name": "qt_documentos",
+      "description": [
+       "Quantos documentos distintos foram unificados nesta identidade."
+      ]
+     }
+    ]
+   },
+   {
+    "identifier": "cielo_pld.silver.lista_monitoramento",
+    "column_configs": [
+     {
+      "column_name": "cd_objeto",
+      "description": [
+       "EC (texto) quando tp_objeto = EC; CPF quando CLIENTE; token quando CARTAO."
+      ]
+     },
+     {
+      "column_name": "fl_ativo",
+      "description": [
+       "Inserção ativa (sem data de saída ou saída futura)."
+      ]
+     },
+     {
+      "column_name": "tp_lista",
+      "description": [
+       "NEGATIVA, POSITIVA ou POSITIVA AUTORIZADA."
+      ],
+      "enable_entity_matching": true
+     },
+     {
+      "column_name": "tp_objeto",
+      "description": [
+       "EC, CLIENTE ou CARTAO."
+      ],
+      "enable_entity_matching": true
+     }
+    ]
+   },
+   {
+    "identifier": "cielo_pld.silver.loja",
+    "column_configs": [
+     {
+      "column_name": "cd_ramo",
+      "exclude": true
+     },
+     {
+      "column_name": "ds_endereco",
+      "description": [
+       "Endereço padronizado."
+      ]
+     },
+     {
+      "column_name": "fl_doc_valido",
+      "description": [
+       "Documento passou na validação do dígito verificador."
+      ]
+     },
+     {
+      "column_name": "fl_fraude",
+      "description": [
+       "1 = fraude confirmada (lista negativa de EC ativa)."
+      ],
+      "synonyms": [
+       "fraude confirmada"
+      ]
+     },
+     {
+      "column_name": "in_alteracao_societaria",
+      "description": [
+       "1 = alteração recente do quadro societário."
+      ]
+     },
+     {
+      "column_name": "in_socio_pep",
+      "description": [
+       "1 = sócio pessoa politicamente exposta."
+      ],
+      "synonyms": [
+       "PEP"
+      ]
+     },
+     {
+      "column_name": "nm_loja",
+      "description": [
+       "Nome fantasia."
+      ],
+      "enable_entity_matching": true
+     },
+     {
+      "column_name": "nm_municipio",
+      "description": [
+       "Município."
+      ],
+      "enable_entity_matching": true
+     },
+     {
+      "column_name": "nm_ramo",
+      "description": [
+       "Ramo de atividade."
+      ],
+      "enable_entity_matching": true
+     },
+     {
+      "column_name": "nm_razao_social",
+      "description": [
+       "Razão social (ou nome do titular PF)."
+      ]
+     },
+     {
+      "column_name": "nu_doc",
+      "description": [
+       "CPF/CNPJ padronizado do titular (só dígitos)."
+      ]
+     },
+     {
+      "column_name": "nu_ec",
+      "description": [
+       "Número do Estabelecimento Comercial (EC) — identificador da loja."
+      ],
+      "synonyms": [
+       "EC",
+       "estabelecimento",
+       "número do EC",
+       "loja"
+      ]
+     },
+     {
+      "column_name": "nu_raiz",
+      "description": [
+       "Raiz do CNPJ (8 dígitos) ou CPF — lojas com a mesma raiz pertencem ao mesmo grupo societário."
+      ]
+     },
+     {
+      "column_name": "pc_chargeback",
+      "description": [
+       "Percentual de chargeback do último mês."
+      ]
+     },
+     {
+      "column_name": "qt_dias_afiliacao",
+      "description": [
+       "Dias desde a afiliação à Cielo."
+      ]
+     },
+     {
+      "column_name": "sg_uf",
+      "description": [
+       "UF da loja."
+      ],
+      "synonyms": [
+       "estado",
+       "UF"
+      ],
+      "enable_entity_matching": true
+     },
+     {
+      "column_name": "tp_cliente",
+      "description": [
+       "Tipo de cliente: E-COMMERCE, BALCAO ou SUB."
+      ],
+      "enable_entity_matching": true
+     },
+     {
+      "column_name": "tp_pessoa",
+      "description": [
+       "PF ou PJ."
+      ],
+      "enable_entity_matching": true
+     },
+     {
+      "column_name": "vl_faturamento",
+      "description": [
+       "Faturamento do último mês (R$)."
+      ]
+     }
+    ]
+   },
+   {
+    "identifier": "cielo_pld.silver.trns_antecipacao",
+    "column_configs": [
+     {
+      "column_name": "ds_conta_domicilio",
+      "description": [
+       "Conta de domicílio onde o valor foi liquidado."
+      ]
+     },
+     {
+      "column_name": "id_unco_lynx",
+      "exclude": true
+     },
+     {
+      "column_name": "nu_doc_responsavel",
+      "description": [
+       "CPF/CNPJ do responsável pela maquininha (sócio)."
+      ],
+      "synonyms": [
+       "sócio"
+      ]
+     },
+     {
+      "column_name": "nu_ec",
+      "description": [
+       "Número do Estabelecimento Comercial (EC) — identificador da loja."
+      ],
+      "synonyms": [
+       "EC",
+       "estabelecimento",
+       "número do EC",
+       "loja"
+      ]
+     },
+     {
+      "column_name": "ts_transacao",
+      "description": [
+       "Data/hora da antecipação de recebíveis (RAD0)."
+      ]
+     },
+     {
+      "column_name": "vl_trns",
+      "description": [
+       "Valor antecipado (R$)."
+      ]
+     }
+    ]
+   },
+   {
+    "identifier": "cielo_pld.silver.trns_cartao",
+    "column_configs": [
+     {
+      "column_name": "ds_email_portador",
+      "exclude": true
+     },
+     {
+      "column_name": "ds_endereco_entrega",
+      "exclude": true
+     },
+     {
+      "column_name": "ds_endereco_portador",
+      "exclude": true
+     },
+     {
+      "column_name": "fl_abaixo_limite",
+      "description": [
+       "Valor logo abaixo de R$ 5 mil / R$ 10 mil (fracionamento)."
+      ],
+      "synonyms": [
+       "fracionamento",
+       "structuring"
+      ]
+     },
+     {
+      "column_name": "fl_cnp",
+      "description": [
+       "Cartão não presente."
+      ]
+     },
+     {
+      "column_name": "fl_madrugada",
+      "description": [
+       "Transação entre 0h e 4h."
+      ]
+     },
+     {
+      "column_name": "fl_regra_pld",
+      "description": [
+       "Acionou regra PLD da Lynx."
+      ]
+     },
+     {
+      "column_name": "fl_valor_redondo",
+      "description": [
+       "Valor redondo (múltiplo de R$ 500)."
+      ]
+     },
+     {
+      "column_name": "id_unco",
+      "exclude": true
+     },
+     {
+      "column_name": "nm_portador",
+      "description": [
+       "Nome do portador."
+      ]
+     },
+     {
+      "column_name": "nu_doc_portador",
+      "description": [
+       "CPF do portador."
+      ]
+     },
+     {
+      "column_name": "nu_ec",
+      "description": [
+       "Número do Estabelecimento Comercial (EC) — identificador da loja."
+      ],
+      "synonyms": [
+       "EC",
+       "estabelecimento",
+       "número do EC",
+       "loja"
+      ]
+     },
+     {
+      "column_name": "nu_telefone_portador",
+      "exclude": true
+     },
+     {
+      "column_name": "qt_cnar_ordm",
+      "exclude": true
+     },
+     {
+      "column_name": "tp_cartao",
+      "description": [
+       "CREDITO, DEBITO ou PRE-PAGO."
+      ],
+      "enable_entity_matching": true
+     },
+     {
+      "column_name": "ts_transacao",
+      "description": [
+       "Data/hora da transação de cartão."
+      ]
+     },
+     {
+      "column_name": "vl_trns",
+      "description": [
+       "Valor (R$)."
+      ]
+     }
+    ]
+   },
+   {
+    "identifier": "cielo_pld.silver.trns_pix",
+    "column_configs": [
+     {
+      "column_name": "ds_chave_pagador",
+      "exclude": true
+     },
+     {
+      "column_name": "ds_chave_recebedor",
+      "exclude": true
+     },
+     {
+      "column_name": "ds_conta_pagador",
+      "description": [
+       "Conta do pagador (ISPB|agência|conta)."
+      ]
+     },
+     {
+      "column_name": "ds_conta_recebedor",
+      "description": [
+       "Conta do recebedor (ISPB|agência|conta)."
+      ]
+     },
+     {
+      "column_name": "ds_email_pagador",
+      "exclude": true
+     },
+     {
+      "column_name": "fl_aprovada",
+      "description": [
+       "PIX aprovado."
+      ]
+     },
+     {
+      "column_name": "id_dispositivo",
+      "description": [
+       "Dispositivo usado pelo pagador."
+      ]
+     },
+     {
+      "column_name": "id_unco_pix",
+      "exclude": true
+     },
+     {
+      "column_name": "nm_pagador",
+      "description": [
+       "Nome do pagador."
+      ]
+     },
+     {
+      "column_name": "nm_recebedor",
+      "description": [
+       "Nome do recebedor."
+      ]
+     },
+     {
+      "column_name": "nu_doc_pagador",
+      "description": [
+       "CPF/CNPJ do pagador."
+      ]
+     },
+     {
+      "column_name": "nu_doc_recebedor",
+      "description": [
+       "CPF/CNPJ do recebedor."
+      ]
+     },
+     {
+      "column_name": "nu_ec",
+      "description": [
+       "Número do Estabelecimento Comercial (EC) — identificador da loja."
+      ],
+      "synonyms": [
+       "EC",
+       "estabelecimento",
+       "número do EC",
+       "loja"
+      ]
+     },
+     {
+      "column_name": "qt_dias_conta",
+      "description": [
+       "Idade da conta do pagador em dias."
+      ]
+     },
+     {
+      "column_name": "qt_marcacoes_laranja_90d",
+      "description": [
+       "Marcações de conta laranja/fraude do pagador nos últimos 90 dias (DICT)."
+      ],
+      "synonyms": [
+       "laranja"
+      ]
+     },
+     {
+      "column_name": "tp_chave_pagador",
+      "enable_entity_matching": true
+     },
+     {
+      "column_name": "tp_chave_recebedor",
+      "enable_entity_matching": true
+     },
+     {
+      "column_name": "tp_operacao",
+      "description": [
+       "PAGAMENTO (cliente paga a loja), TRANSFERENCIA (loja/pessoa transfere) ou SAQUE."
+      ],
+      "enable_entity_matching": true
+     },
+     {
+      "column_name": "ts_transacao",
+      "description": [
+       "Data/hora do PIX (dados de 2026-08-01 a 2026-09-30)."
+      ]
+     },
+     {
+      "column_name": "vl_trns",
+      "description": [
+       "Valor do PIX (R$)."
+      ],
+      "synonyms": [
+       "valor"
+      ]
+     }
+    ]
+   }
+  ]
+ },
+ "instructions": {
+  "text_instructions": [
+   {
+    "id": "5c32917a77a14cff49921093951111cb",
+    "content": [
+     "## PURPOSE\n- Apoiar analistas de PLD e prevenção a fraude da Cielo a priorizar e explicar lojas (EC) suspeitas usando o score do modelo e o grafo de vínculos.\n\n## DISAMBIGUATION\n- \"loja\", \"EC\" e \"estabelecimento\" referem-se a nu_ec.\n- \"risco alto\" = faixa_risco ALTO; \"novo suspeito\" = fl_novo_suspeito = 1; \"fraude confirmada\" = lista negativa de EC ativa (fl_fraude_confirmada ou loja.fl_fraude).\n- \"grupo\", \"anel\" ou \"rede\" da loja = lojas com o mesmo id_componente.\n\n## DATA QUALITY NOTES\n- principais_sinais traz nomes técnicos de features; ao responder, traduza para linguagem de negócio (ex.: fl_conta_compartilhada = conta compartilhada com outra loja; dist_fraude = proximidade de loja fraudada; dias_afiliacao = afiliação recente).\n- dist_fraude = 99 significa que não há caminho até loja fraudada.\n- Transações (PIX, cartão, antecipação) cobrem 2026-08-01 a 2026-09-30. Dados sintéticos de demonstração.\n\n## CONSTRAINTS\n- O score é um indício para priorizar a investigação, não uma prova de lavagem: nunca afirme que a loja cometeu crime.\n\n## Instructions you must follow when providing summaries\n- Ao explicar uma loja, cite o score, a posição na fila, os principais sinais traduzidos e os vínculos com outras lojas (grupo, conta, sócio, ciclos de PIX).\n- Arredonde valores em reais sem centavos e scores com 3 casas decimais."
+    ]
+   }
+  ],
+  "example_question_sqls": [
+   {
+    "id": "0057b8749388614364653eb60daf42ec",
+    "question": [
+     "Quais são as lojas de maior risco que ainda não estão na lista negativa?"
+    ],
+    "sql": [
+     "SELECT fila_investigacao_pld.posicao_fila, fila_investigacao_pld.nu_ec, fila_investigacao_pld.nm_loja, fila_investigacao_pld.nm_ramo, ROUND(fila_investigacao_pld.score_pld, 3) AS score_pld, fila_investigacao_pld.principais_sinais FROM cielo_pld.gold.fila_investigacao_pld fila_investigacao_pld WHERE fila_investigacao_pld.fl_novo_suspeito = 1 ORDER BY fila_investigacao_pld.posicao_fila LIMIT 10"
+    ],
+    "usage_guidance": [
+     "Ranking de novos suspeitos: filtre fl_novo_suspeito = 1 e ordene por posicao_fila."
+    ]
+   },
+   {
+    "id": "0fc169d54b6b2a472f52b604ad9d4693",
+    "question": [
+     "Quais lojas têm sócio em comum com uma loja fraudada?"
+    ],
+    "sql": [
+     "SELECT DISTINCT va.nu_ec AS nu_ec, va.nome AS loja, vs.nome AS socio, vb.nu_ec AS nu_ec_fraudada, vb.nome AS loja_fraudada FROM cielo_pld.gold.grafo_arestas_resolvido a1 JOIN cielo_pld.gold.grafo_arestas_resolvido a2 ON a1.dst = a2.dst AND a1.src <> a2.src JOIN cielo_pld.gold.grafo_vertices_resolvido va ON va.id = a1.src JOIN cielo_pld.gold.grafo_vertices_resolvido vb ON vb.id = a2.src JOIN cielo_pld.gold.grafo_vertices_resolvido vs ON vs.id = a1.dst WHERE a1.relacao = 'socio' AND a2.relacao = 'socio' AND va.fl_fraude = 0 AND vb.fl_fraude = 1 LIMIT 50"
+    ],
+    "usage_guidance": [
+     "Sócio em comum: mesma lógica de atributo compartilhado com relacao = 'socio'."
+    ]
+   },
+   {
+    "id": "99107d928df06af3439f9efd4e4c2a72",
+    "question": [
+     "Quais outras lojas estão no mesmo grupo de vínculos da loja EC 2112816701?"
+    ],
+    "sql": [
+     "SELECT f2.nu_ec, f2.nm_loja, f2.faixa_risco, ROUND(f2.score_pld, 3) AS score_pld, f2.fl_fraude_confirmada FROM cielo_pld.gold.fila_investigacao_pld f1 JOIN cielo_pld.gold.fila_investigacao_pld f2 ON f2.id_componente = f1.id_componente AND f2.nu_ec <> f1.nu_ec WHERE f1.nu_ec = 2112816701 ORDER BY f2.fl_fraude_confirmada DESC, f2.score_pld DESC"
+    ],
+    "usage_guidance": [
+     "Mesmo grupo/anel = mesmo id_componente."
+    ]
+   },
+   {
+    "id": "bf6afb947b16eba6bc800e62e49e2d24",
+    "question": [
+     "Por que a loja EC 2112816701 está com risco alto?"
+    ],
+    "sql": [
+     "SELECT fila_investigacao_pld.nu_ec, fila_investigacao_pld.nm_loja, fila_investigacao_pld.posicao_fila, ROUND(fila_investigacao_pld.score_pld, 3) AS score_pld, fila_investigacao_pld.faixa_risco, fila_investigacao_pld.principais_sinais, loja.nm_ramo, loja.qt_dias_afiliacao, loja.pc_chargeback, loja.in_socio_pep, loja.in_alteracao_societaria, features_grafo_loja.qt_lojas_componente, features_grafo_loja.qt_raizes_componente, features_grafo_loja.qt_outras_lojas_fraude_componente, features_grafo_loja.fl_conta_compartilhada, features_grafo_loja.fl_socio_comum_fraude, features_grafo_loja.qt_ciclos_pix, features_grafo_loja.dist_fraude, features_grafo_loja.pct_vizinhos_fraude FROM cielo_pld.gold.fila_investigacao_pld fila_investigacao_pld JOIN cielo_pld.silver.loja loja ON loja.nu_ec = fila_investigacao_pld.nu_ec JOIN cielo_pld.gold.features_grafo_loja features_grafo_loja ON features_grafo_loja.nu_ec = fila_investigacao_pld.nu_ec WHERE fila_investigacao_pld.nu_ec = 2112816701"
+    ],
+    "usage_guidance": [
+     "Para explicar o risco de uma loja: troque o EC e combine score, principais_sinais, cadastro e features de grafo."
+    ]
+   },
+   {
+    "id": "dffc93fce12775c2f9e9a09b4a0fef41",
+    "question": [
+     "Quem mais recebe PIX de lojas em risco ALTO?"
+    ],
+    "sql": [
+     "SELECT trns_pix.nu_doc_recebedor, trns_pix.nm_recebedor, COUNT(*) AS qt_pix, ROUND(SUM(trns_pix.vl_trns), 2) AS vl_total, COUNT(DISTINCT trns_pix.nu_ec) AS qt_lojas FROM cielo_pld.silver.trns_pix trns_pix JOIN cielo_pld.gold.fila_investigacao_pld fila_investigacao_pld ON fila_investigacao_pld.nu_ec = trns_pix.nu_ec WHERE fila_investigacao_pld.faixa_risco = 'ALTO' AND trns_pix.tp_operacao = 'TRANSFERENCIA' AND trns_pix.fl_aprovada GROUP BY trns_pix.nu_doc_recebedor, trns_pix.nm_recebedor ORDER BY vl_total DESC LIMIT 20"
+    ],
+    "usage_guidance": [
+     "Saídas de dinheiro das lojas: tp_operacao = 'TRANSFERENCIA' (loja como pagadora)."
+    ]
+   },
+   {
+    "id": "e0c232e91df936b05e49a6f7e1200de3",
+    "question": [
+     "Quais lojas compartilham conta de liquidação com lojas que têm fraude confirmada?"
+    ],
+    "sql": [
+     "SELECT DISTINCT va.nu_ec AS nu_ec, va.nome AS loja, vb.nu_ec AS nu_ec_fraudada, vb.nome AS loja_fraudada, a1.dst AS conta FROM cielo_pld.gold.grafo_arestas_resolvido a1 JOIN cielo_pld.gold.grafo_arestas_resolvido a2 ON a1.dst = a2.dst AND a1.src <> a2.src JOIN cielo_pld.gold.grafo_vertices_resolvido va ON va.id = a1.src JOIN cielo_pld.gold.grafo_vertices_resolvido vb ON vb.id = a2.src WHERE a1.relacao = 'liquida_em' AND a2.relacao = 'liquida_em' AND va.fl_fraude = 0 AND vb.fl_fraude = 1 ORDER BY loja LIMIT 50"
+    ],
+    "usage_guidance": [
+     "Atributo compartilhado entre lojas: auto-join de grafo_arestas_resolvido pelo dst (conta/telefone/endereço) filtrando relacao."
+    ]
+   }
+  ],
+  "join_specs": [
+   {
+    "id": "04403804eaa95be83f345620455542ac",
+    "left": {
+     "identifier": "cielo_pld.silver.loja",
+     "alias": "loja"
+    },
+    "right": {
+     "identifier": "cielo_pld.silver.trns_cartao",
+     "alias": "trns_cartao"
+    },
+    "sql": [
+     "`loja`.`nu_ec` = `trns_cartao`.`nu_ec`",
+     "--rt=FROM_RELATIONSHIP_TYPE_ONE_TO_MANY--"
+    ]
+   },
+   {
+    "id": "20509ef2a9ef83bbbce7da32d475f2c5",
+    "left": {
+     "identifier": "cielo_pld.silver.loja",
+     "alias": "loja"
+    },
+    "right": {
+     "identifier": "cielo_pld.silver.fraude_reportada",
+     "alias": "fraude_reportada"
+    },
+    "sql": [
+     "`loja`.`nu_ec` = `fraude_reportada`.`nu_ec`",
+     "--rt=FROM_RELATIONSHIP_TYPE_ONE_TO_MANY--"
+    ]
+   },
+   {
+    "id": "412b6af3b1d166934ec08719d48a6503",
+    "left": {
+     "identifier": "cielo_pld.gold.grafo_arestas_resolvido",
+     "alias": "grafo_arestas_resolvido"
+    },
+    "right": {
+     "identifier": "cielo_pld.gold.grafo_vertices_resolvido",
+     "alias": "grafo_vertices_resolvido"
+    },
+    "sql": [
+     "`grafo_arestas_resolvido`.`src` = `grafo_vertices_resolvido`.`id`",
+     "--rt=FROM_RELATIONSHIP_TYPE_MANY_TO_ONE--"
+    ]
+   },
+   {
+    "id": "42f91ebaf5599401b1d08ad6a14b170c",
+    "left": {
+     "identifier": "cielo_pld.silver.loja",
+     "alias": "loja"
+    },
+    "right": {
+     "identifier": "cielo_pld.silver.trns_pix",
+     "alias": "trns_pix"
+    },
+    "sql": [
+     "`loja`.`nu_ec` = `trns_pix`.`nu_ec`",
+     "--rt=FROM_RELATIONSHIP_TYPE_ONE_TO_MANY--"
+    ]
+   },
+   {
+    "id": "91186048a4505bf0e982ad4bc92180f0",
+    "left": {
+     "identifier": "cielo_pld.silver.loja",
+     "alias": "loja"
+    },
+    "right": {
+     "identifier": "cielo_pld.silver.trns_antecipacao",
+     "alias": "trns_antecipacao"
+    },
+    "sql": [
+     "`loja`.`nu_ec` = `trns_antecipacao`.`nu_ec`",
+     "--rt=FROM_RELATIONSHIP_TYPE_ONE_TO_MANY--"
+    ]
+   },
+   {
+    "id": "98d59900f43444ebc7e5566aa677215b",
+    "left": {
+     "identifier": "cielo_pld.silver.loja",
+     "alias": "loja"
+    },
+    "right": {
+     "identifier": "cielo_pld.silver.identidade",
+     "alias": "identidade"
+    },
+    "sql": [
+     "`loja`.`nu_doc` = `identidade`.`cpf_cnpj`",
+     "--rt=FROM_RELATIONSHIP_TYPE_MANY_TO_ONE--"
+    ]
+   },
+   {
+    "id": "cd1fb741b8d35c8a99c78374f08294d5",
+    "left": {
+     "identifier": "cielo_pld.gold.fila_investigacao_pld",
+     "alias": "fila_investigacao_pld"
+    },
+    "right": {
+     "identifier": "cielo_pld.silver.loja",
+     "alias": "loja"
+    },
+    "sql": [
+     "`fila_investigacao_pld`.`nu_ec` = `loja`.`nu_ec`",
+     "--rt=FROM_RELATIONSHIP_TYPE_ONE_TO_ONE--"
+    ]
+   },
+   {
+    "id": "e8cde9d10b2047524dd695fc72d0e462",
+    "left": {
+     "identifier": "cielo_pld.gold.fila_investigacao_pld",
+     "alias": "fila_investigacao_pld"
+    },
+    "right": {
+     "identifier": "cielo_pld.gold.features_grafo_loja",
+     "alias": "features_grafo_loja"
+    },
+    "sql": [
+     "`fila_investigacao_pld`.`nu_ec` = `features_grafo_loja`.`nu_ec`",
+     "--rt=FROM_RELATIONSHIP_TYPE_ONE_TO_ONE--"
+    ]
+   }
+  ],
+  "sql_snippets": {
+   "filters": [
+    {
+     "id": "89315119938f9f05a7a8cc9e4ba68150",
+     "display_name": "Lojas em risco ALTO",
+     "sql": [
+      "fila_investigacao_pld.faixa_risco = 'ALTO'"
+     ],
+     "synonyms": [
+      "risco alto",
+      "alto risco"
+     ]
+    },
+    {
+     "id": "8df403bdf026b83b2771b1116a69beba",
+     "display_name": "Fraude confirmada",
+     "sql": [
+      "fila_investigacao_pld.fl_fraude_confirmada = 1"
+     ],
+     "synonyms": [
+      "lista negativa",
+      "fraudadas"
+     ]
+    },
+    {
+     "id": "f8371b6c3ca955b67a7d4a829eb74ae9",
+     "display_name": "Novos suspeitos",
+     "sql": [
+      "fila_investigacao_pld.fl_novo_suspeito = 1"
+     ],
+     "synonyms": [
+      "não listadas",
+      "fora da lista negativa"
+     ]
+    }
+   ],
+   "measures": [
+    {
+     "id": "07b6a6dca92f70648dc8c84f30943468",
+     "alias": "vl_pix",
+     "display_name": "Valor de PIX (R$)",
+     "sql": [
+      "SUM(trns_pix.vl_trns)"
+     ],
+     "synonyms": [
+      "volume PIX",
+      "valor PIX"
+     ]
+    },
+    {
+     "id": "67395a93f255eb28844fefdf4a94884d",
+     "alias": "qt_lojas",
+     "display_name": "Quantidade de lojas",
+     "sql": [
+      "COUNT(DISTINCT fila_investigacao_pld.nu_ec)"
+     ],
+     "synonyms": [
+      "número de lojas",
+      "quantas lojas"
+     ]
+    }
+   ]
+  }
+ }
+}

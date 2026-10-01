@@ -1,0 +1,76 @@
+bundle:
+  name: cielo-pld-grafos
+
+variables:
+  sql_warehouse_id:
+    description: SQL Warehouse usado pelas consultas do App e pelo Genie Agent
+  genie_space_id:
+    description: ID do Genie Agent "Cielo PLD · Investigação em grafos"
+  genie_space_name:
+    description: Nome do recurso Genie no App
+    default: genie-pld
+  catalogo:
+    description: Catálogo Unity Catalog com as camadas silver/gold do PLD
+    default: cielo_pld
+
+resources:
+  apps:
+    app:
+      name: "cielo-pld-grafos"
+      description: "Investigação PLD com grafos: fila de risco, rede de vínculos e Genie Agent"
+      source_code_path: ./
+
+      # Inicia o App automaticamente no deploy
+      lifecycle:
+        started: true
+
+      # Sem user_api_scopes: consultas e Genie rodam com o service principal do App (decisão do projeto).
+      # Para executar em nome do analista (OBO), descomente:
+      # user_api_scopes:
+      #   - sql
+      #   - dashboards.genie
+
+      # Recursos do App — as permissões abaixo são concedidas ao service principal automaticamente no deploy
+      resources:
+        - name: sql-warehouse
+          sql_warehouse:
+            id: ${var.sql_warehouse_id}
+            permission: CAN_USE
+        - name: genie-space
+          genie_space:
+            name: ${var.genie_space_name}
+            space_id: ${var.genie_space_id}
+            permission: CAN_RUN
+        # Tabelas lidas pelo App e pelo Genie Agent (SELECT)
+        - name: tbl-fila
+          uc_securable: { securable_type: TABLE, securable_full_name: "${var.catalogo}.gold.fila_investigacao_pld", permission: SELECT }
+        - name: tbl-features
+          uc_securable: { securable_type: TABLE, securable_full_name: "${var.catalogo}.gold.features_grafo_loja", permission: SELECT }
+        - name: tbl-vertices
+          uc_securable: { securable_type: TABLE, securable_full_name: "${var.catalogo}.gold.grafo_vertices_resolvido", permission: SELECT }
+        - name: tbl-arestas
+          uc_securable: { securable_type: TABLE, securable_full_name: "${var.catalogo}.gold.grafo_arestas_resolvido", permission: SELECT }
+        - name: tbl-loja
+          uc_securable: { securable_type: TABLE, securable_full_name: "${var.catalogo}.silver.loja", permission: SELECT }
+        - name: tbl-pix
+          uc_securable: { securable_type: TABLE, securable_full_name: "${var.catalogo}.silver.trns_pix", permission: SELECT }
+        - name: tbl-cartao
+          uc_securable: { securable_type: TABLE, securable_full_name: "${var.catalogo}.silver.trns_cartao", permission: SELECT }
+        - name: tbl-antecipacao
+          uc_securable: { securable_type: TABLE, securable_full_name: "${var.catalogo}.silver.trns_antecipacao", permission: SELECT }
+        - name: tbl-identidade
+          uc_securable: { securable_type: TABLE, securable_full_name: "${var.catalogo}.silver.identidade", permission: SELECT }
+        - name: tbl-listas
+          uc_securable: { securable_type: TABLE, securable_full_name: "${var.catalogo}.silver.lista_monitoramento", permission: SELECT }
+        - name: tbl-fraude
+          uc_securable: { securable_type: TABLE, securable_full_name: "${var.catalogo}.silver.fraude_reportada", permission: SELECT }
+
+targets:
+  default:
+    default: true
+    workspace:
+      host: https://dbc-97a20602-e668.cloud.databricks.com
+
+    variables:
+      sql_warehouse_id: 56a4abac2d9d8014
+      genie_space_id: 01f1bdacc8141798b11a226a3eb97cac
